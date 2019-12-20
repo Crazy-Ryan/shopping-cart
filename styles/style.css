@@ -1,33 +1,51 @@
-body{
+body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-h3{
+h3 {
   text-align: center;
-  font-size: 30px;  
+  font-size: 30px;
   margin: 15px;
 }
 
-table{
+table {
   border-collapse: collapse;
   margin: 0 auto;
   font-size: 20px;
 }
 
-#head-row{
-  font-size: 25px;
+thead {
+  font-size: 22px;
   background-color: #eeeeee;
 }
 
-#foot-row{
-  font-size: 25px;
+tfoot {
+  font-size: 22px;
 }
-#foot-row td:last-child{
+
+tfoot td:last-child {
   text-align: right;
 }
 
-td{
-  margin: 0;
+td {
+  text-align: center;
   padding: 10px;
   border: 1px solid #dddddd;
+}
+
+.math-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dddddd;
+  font-size: 30px;
+  background-color: #eeeeee;
+}
+
+.quantity-box {
+  display: inline-block;
+  text-align: center;
+  width: 50px;
 }
