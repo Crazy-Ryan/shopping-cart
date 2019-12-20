@@ -43,19 +43,19 @@ var carProducts = [
     "checked": false
   }
 ]
-
-var shoppingList = document.getElementsByClassName("shopping-list");
+var shoppingTable = document.getElementsByClassName("shopping-table")[0]; 
+var shoppingList = document.getElementsByClassName("shopping-list")[0];
 var goodCount = document.getElementsByClassName("good-count")[0];
 var totalCost = document.getElementsByClassName("total-cost")[0];
 var selectAll = document.getElementsByClassName("select-all")[0];
-var cellName = ['checked', 'name', 'price', 'quantity', 'good-cost'];
+var cellName = ['checked', 'name', 'price', 'count', 'good-cost'];
 var cellQuery = ['checked', 'name', 'price', 'count', 'id'];
 var isSelectAllChecked = false;
 
 for (var index = 0; index < carProducts.length; index++) {
   // var newRow = createRow('shopping-list');
   var cellIndex = 0;
-  var newRow = createRow(shoppingList[0]);
+  var newRow = createRow(shoppingList);
   newRow.setAttribute('row-id', carProducts[index]['id']);
   for (var iter = 0, max = Object.getOwnPropertyNames(carProducts[index]).length; iter < max; iter++) {
     cellIndex++;
@@ -144,7 +144,7 @@ function setGoodCheckStatus() {
 }
 
 function setItemCost() {
-  var rowEls = shoppingList[0].children;
+  var rowEls = shoppingList.children;
   for (var index = 0; index < rowEls.length; index++) {
     var rowId = rowEls[index].getAttribute('row-id');
     rowEls[index].getElementsByClassName(cellName[4])[0].textContent =
@@ -153,7 +153,7 @@ function setItemCost() {
 }
 
 function setGoodCost() {
-  var rowEls = shoppingList[0].children;
+  var rowEls = shoppingList.children;
   for (var index = 0; index < rowEls.length; index++) {
     var rowId = rowEls[index].getAttribute('row-id');
     rowEls[index].getElementsByClassName(cellName[4])[0].textContent =
@@ -162,7 +162,7 @@ function setGoodCost() {
 }
 
 function setGoodCount() {
-  var rowEls = shoppingList[0].children;
+  var rowEls = shoppingList.children;
   var sum = 0;
   for (var index = 0; index < rowEls.length; index++) {
     var rowId = rowEls[index].getAttribute('row-id');
@@ -194,5 +194,77 @@ function updateList() {
 }
 
 updateList();
+shoppingTable.addEventListener('click',clickHandle);
+function clickHandle(event) {
+  var currentClass = event.target.getAttribute('class')
+    || event.target.parentElement.getAttribute('class')
+    || event.target.parentElement.parentElement.getAttribute('class');
+  var rowId = event.target.parentElement.getAttribute('row-id')
+    || event.target.parentElement.parentElement.getAttribute('row-id')
+    || event.target.parentElement.parentElement.parentElement.getAttribute('row-id');
+  console.log(event.target);
+    console.log(currentClass);
+  console.log(rowId);
+  switch (currentClass) {
+    case 'select-all':
+      onClickSelectAll();
+      break;
+    case 'checked':
+      onClickGoodChecked(rowId);
+      break;
+    case 'math-icon':
+      onClickMathIcon(event.target.innerHTML,rowId,event.target);
+      break;
+  }
+  updateList();
+}
 
+function onClickSelectAll() {
+  if (isSelectAllChecked === false) {
+    isSelectAllChecked = true;
+  }
+  else {
+    isSelectAllChecked = false;
+  }
+  var rowEls = shoppingList.children;
+  for (var index = 0; index < rowEls.length; index++) {
+    carProducts[index][cellName[0]] = isSelectAllChecked;
+    
+  }
+  var checkBoxEls=document.getElementsByClassName(cellName[0]);
+  for (var index = 0; index < checkBoxEls.length; index++) {
+    checkBoxEls[index].removeChild(checkBoxEls[index].firstChild);
+    checkBoxEls[index].appendChild(createCheckBox());
+  }
+}
+
+function onClickGoodChecked(rowId, checkBoxEl) {
+  if (carProducts[rowId - 1][cellName[0]] === false) {
+    carProducts[rowId - 1][cellName[0]] = true;
+  } else {
+    carProducts[rowId - 1][cellName[0]] = false;
+    renewSelectAllCheckBox();
+  }
+}
+
+function renewSelectAllCheckBox(){
+  isSelectAllChecked = false;
+  var selectAllParentEl = selectAll.parentElement;
+  selectAllParentEl.removeChild(selectAll);
+  selectAll = createCheckBox();
+  selectAllParentEl.appendChild(selectAll);
+  selectAll.setAttribute('class', 'select-all');
+}
+
+function onClickMathIcon(operator,rowId,target){
+  if (operator === '+'){
+    event.target.parentElement.getElementsByClassName('quantity-box')[0].innerHTML=++carProducts[rowId - 1][cellName[3]];
+  } else{
+    event.target.parentElement.getElementsByClassName('quantity-box')[0].innerHTML=--carProducts[rowId - 1][cellName[3]];
+    if (carProducts[rowId - 1][cellName[3]] <= 0)
+    {
+      shoppingList.removeChild(target.parentElement.parentElement)
+    }
+  }
+}
 //删除商品时要取消选中
