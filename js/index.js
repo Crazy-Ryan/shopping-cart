@@ -52,16 +52,16 @@ var selectAll = document.getElementsByClassName("select-all")[0];
 var cellName = ['checked', 'name', 'price', 'count', 'good-cost'];
 var isSelectAllChecked = false;
 
-initialList();
+initializeList();
 updateList();
-shoppingTable.addEventListener('click', clickHandle);
+clickEventListen();
 
-function initialList() {
+function initializeList() {
   for (var index = 0; index < carProducts.length; index++) {
     var cellIndex = 0;
     var newRow = createRow(shoppingList);
     var cellQuery = ['checked', 'name', 'price', 'count', 'id'];
-    newRow.setAttribute('row-id', carProducts[index]['id']);
+    newRow.setAttribute('good-id', carProducts[index]['id']);
     for (var iter = 0, max = Object.getOwnPropertyNames(carProducts[index]).length; iter < max; iter++) {
       cellIndex++;
       var newCell = createCell(newRow);
@@ -75,17 +75,21 @@ function updateList() {
   setSelectAllCheckStatus();
   setGoodCheckStatus();
   setGoodCost();
-  goodCount.textContent = setGoodCount();
-  totalCost.textContent = setTotalCost()
+  goodCount.textContent = setGoodCount().toString();
+  totalCost.textContent = setTotalCost().toString();
+}
+
+function clickEventListen() {
+  shoppingTable.addEventListener('click', clickHandle);
 }
 
 function clickHandle(event) {
   var currentClass = event.target.getAttribute('class')
     || event.target.parentElement.getAttribute('class')
     || event.target.parentElement.parentElement.getAttribute('class');
-  var rowId = event.target.parentElement.getAttribute('row-id')
-    || event.target.parentElement.parentElement.getAttribute('row-id')
-    || event.target.parentElement.parentElement.parentElement.getAttribute('row-id');
+  var rowId = event.target.parentElement.getAttribute('good-id')
+    || event.target.parentElement.parentElement.getAttribute('good-id')
+    || event.target.parentElement.parentElement.parentElement.getAttribute('good-id');
   switch (currentClass) {
     case 'select-all':
       onClickSelectAll();
@@ -167,7 +171,7 @@ function setSelectAllCheckStatus() {
 function setGoodCheckStatus() {
   var checkBoxEls = document.getElementsByClassName(cellName[0]);
   for (var index = 0; index < checkBoxEls.length; index++) {
-    if (true === carProducts[checkBoxEls[index].parentElement.getAttribute("row-id") - 1][cellName[0]]) {
+    if (true === carProducts[checkBoxEls[index].parentElement.getAttribute("good-id") - 1][cellName[0]]) {
       checkBoxEls[index].firstChild.setAttribute('checked', 'checked');
     } else {
       checkBoxEls[index].firstChild.removeAttribute('checked');
@@ -178,7 +182,7 @@ function setGoodCheckStatus() {
 function setGoodCost() {
   var rowEls = shoppingList.children;
   for (var index = 0; index < rowEls.length; index++) {
-    var rowId = rowEls[index].getAttribute('row-id');
+    var rowId = rowEls[index].getAttribute('good-id');
     rowEls[index].getElementsByClassName(cellName[4])[0].textContent =
       carProducts[rowId - 1][cellName[2]] * carProducts[rowId - 1][cellName[3]];
   }
@@ -188,7 +192,7 @@ function setGoodCount() {
   var rowEls = shoppingList.children;
   var sum = 0;
   for (var index = 0; index < rowEls.length; index++) {
-    var rowId = rowEls[index].getAttribute('row-id');
+    var rowId = rowEls[index].getAttribute('good-id');
     if (true === carProducts[rowId - 1][cellName[0]]) {
       sum += carProducts[rowId - 1][cellName[3]];
     }
@@ -200,7 +204,7 @@ function setTotalCost() {
   var goodCostEls = document.getElementsByClassName(cellName[4]);
   var sum = 0;
   for (var index = 0; index < goodCostEls.length; index++) {
-    var rowId = goodCostEls[index].parentElement.getAttribute('row-id');
+    var rowId = goodCostEls[index].parentElement.getAttribute('good-id');
     if (true === carProducts[rowId - 1][cellName[0]]) {
       sum += (+goodCostEls[index].textContent);
     }
@@ -209,17 +213,11 @@ function setTotalCost() {
 }
 
 function onClickSelectAll() {
-  if (false === isSelectAllChecked) {
-    isSelectAllChecked = true;
-  }
-  else {
-    isSelectAllChecked = false;
-  }
+  isSelectAllChecked = !isSelectAllChecked;
   resetGoodCheckBox();
 }
 
 function resetGoodCheckBox() {
-  var rowEls = shoppingList.children;
   for (var index = 0; index < carProducts.length; index++) {
     carProducts[index][cellName[0]] = isSelectAllChecked;
   }
@@ -230,8 +228,8 @@ function resetGoodCheckBox() {
   }
 }
 
-function onClickGoodChecked(rowId, checkBoxEl) {
-  if (false === carProducts[rowId - 1][cellName[0]]) {
+function onClickGoodChecked(rowId) {
+  if (!(carProducts[rowId - 1][cellName[0]])) {
     carProducts[rowId - 1][cellName[0]] = true;
   } else {
     carProducts[rowId - 1][cellName[0]] = false;
